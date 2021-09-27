@@ -11,11 +11,9 @@ namespace DeliVeggie.API.Controllers
     [ApiController]
     public class ProductController : ControllerBase
     {
-        private readonly IOptions<AppSettings> _appSettings;
         private readonly IProductProcessor _productService;
-        public ProductController(IOptions<AppSettings> settings, IProductProcessor productService)
+        public ProductController(IProductProcessor productService)
         {
-            this._appSettings = settings;
             this._productService = productService;
         }
 
@@ -24,6 +22,10 @@ namespace DeliVeggie.API.Controllers
         public IActionResult GetProducts()
         {
             var response = _productService.GetProducts();
+            if(response == null)
+            {
+                return NotFound();
+            }
             return Ok(response);
         }
 
@@ -32,6 +34,10 @@ namespace DeliVeggie.API.Controllers
         public IActionResult GetProductDetails(int id)
         {
             var response = _productService.GetProductDetails(id);
+            if (response == null)
+            {
+                return NotFound();
+            }
             return Ok(response);
         }
     }

@@ -13,7 +13,6 @@ namespace DeliVeggie.Repository
     public class ProductRepository : IProductRepository
     {
         protected static IMongoClient client;
-        protected static IMongoDatabase database;
 
         private static IMongoDatabase GetDatabase()
         {
@@ -28,40 +27,48 @@ namespace DeliVeggie.Repository
             }
         }
 
-        //private static IEnumerable<ProductsResponse> productResponses = new List<ProductsResponse>()
-        //{
-        //    new ProductsResponse{ Id = "1", Name = "Tomato"},
-        //    new ProductsResponse{ Id = "2", Name = "Potato"},
-        //    new ProductsResponse{ Id = "3", Name = "Carrot"}
-        //};
-
         public async Task<List<ProductsResponse>> GetProducts()
         {
-            var collection = GetDatabase().GetCollection<Domain.Entity.Product>("products");
-            var products = await collection.Find(data => true).ToListAsync();
-
-            //var products = productResponses;
-            var response = products.Select(product => new ProductsResponse
+            try
             {
-                Id = product.Id.ToString(),
-                Name = product.Name
-            }).ToList();
-            return response;
+                var collection = GetDatabase().GetCollection<Domain.Entity.Product>("products");
+                var products = await collection.Find(data => true).ToListAsync();
+
+                var response = products.Select(product => new ProductsResponse
+                {
+                    Id = product.Id.ToString(),
+                    Name = product.Name
+                }).ToList();
+                return response;
+            }
+            catch(Exception ex)
+            {
+
+            }
+            return null;
         }
 
         public async Task<ProductDetailsResponse> GetProductDetails(ProductDetailsRequest request)
         {
-            var collection = GetDatabase().GetCollection<Domain.Entity.Product>("products");
-            var response = await collection.Find(a => a.Id == request.ProductId).FirstOrDefaultAsync();
-            var reduction = GetPriceReduction((int)DateTime.Now.DayOfWeek);
-            var priceAfterReduction = response.Price - (response.Price * reduction);
-            return new ProductDetailsResponse()
+            try
             {
-                Id = response.Id.ToString(),
-                Name = response.Name,
-                EntryDate = response.EntryDate,
-                PriceWithReduction = priceAfterReduction
-            };
+                var collection = GetDatabase().GetCollection<Domain.Entity.Product>("products");
+                var response = await collection.Find(a => a.Id == request.ProductId).FirstOrDefaultAsync();
+                var reduction = GetPriceReduction((int)DateTime.Now.DayOfWeek);
+                var priceAfterReduction = response.Price - (response.Price * reduction);
+                return new ProductDetailsResponse()
+                {
+                    Id = response.Id.ToString(),
+                    Name = response.Name,
+                    EntryDate = response.EntryDate,
+                    PriceWithReduction = priceAfterReduction
+                };
+            }
+            catch(Exception ex)
+            {
+
+            }
+            return null;
         }
 
         public double GetPriceReduction(int dayOfWeek)

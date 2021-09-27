@@ -16,4 +16,8 @@
     <ProjectReference Include="..\DeliVeggie.Repository\DeliVeggie.Repository.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="..\.dockerignore" />
+  </ItemGroup>
+
 </Project>
